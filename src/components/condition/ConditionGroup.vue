@@ -1,8 +1,8 @@
 <template>
   <div class="condition-group" style="display: flex"
        :class="isHover?'is-hover':''"
-       @mouseover.stop="isHover = true"
-       @mouseout.stop="isHover = false">
+       @mouseover.stop="setHover(true)"
+       @mouseleave.stop="setHover(false)">
     <div class="condition-group-conjunction">
       <a-button v-if="children.length > 1" class="condition-group-conjunction-arrow" shape="circle"
                 :icon="collapse?'up':'down'" size="small" @click="toggleFold"/>
@@ -13,15 +13,16 @@
     </div>
     <div class="condition-group-wrapper" style="flex: 1">
       <template v-if="conditionGroup.children && conditionGroup.children.length">
-        <draggable :list="children" v-bind="draggableOptions">
+        <draggable :list="children" v-bind="draggableOptions" @start="setMouseDown(true)" @end="setMouseDown(false)">
           <transition-group type="transition">
             <div v-for="(element,index) in conditionGroup.children" :key="element.id"
                  v-show="index === 0 || (!collapse && index !== 0)">
                 <condition-group v-if="element.conjunction && element.children"
                                  :ref="'sub-group'" class="sub-group"
+                                 :parent="me"
                                  :conditionGroup="element"
                                  :removable="true" :parent-condition-group="conditionGroup"/>
-              <condition-item class="condition-group-wrapper-body" v-else :condition="element"/>
+              <condition-item  class="condition-group-wrapper-body" v-else :condition="element"/>
             </div>
           </transition-group>
         </draggable>
@@ -60,6 +61,7 @@ export default {
   name: "ConditionGroup",
   components: { ConditionItem, draggable },
   props: {
+    parent: {},
     conditionGroup: {
       required: true,
       type: Object
@@ -82,10 +84,28 @@ export default {
       draggableOptions: {
         animation: 200
       },
-      isHover: false
+      isHover: false,
+      isMouseDown:false
+    }
+  },
+  computed: {
+    me() {
+      return this
     }
   },
   methods: {
+    setHover(isHover) {
+      if(!this.isMouseDown) {
+        this.isHover = isHover
+        console.log(this.parent)
+        this.parent?.setHover(false)
+      }
+    },
+    setMouseDown(isMouseDown) {
+      console.log(isMouseDown)
+      this.isMouseDown = isMouseDown
+      this.$refs["sub-group"]?.forEach(item=> item.setMouseDown(isMouseDown))
+    },
     toggleFold() {
       if (this.children.length <= 1) {
         return
@@ -93,7 +113,7 @@ export default {
 
       this.collapse = !this.collapse
       for (let i = 0; i < this.children.length; i++) {
-        this.$refs["sub-group"].forEach(item=> item.fold(this.collapse))
+        this.$refs["sub-group"]?.forEach(item=> item.fold(this.collapse))
       }
     },
     fold(isTrue) {
@@ -145,6 +165,7 @@ export default {
 .condition-group {
     display: flex;
     margin-top: 20px;
+    border-radius: 15px;
 }
 
 .condition-group.sub-group:hover {
@@ -153,7 +174,7 @@ export default {
 .condition-group.sub-group.is-hover {
     transition: all 0.3s ease;
     border-radius: 15px;
-    box-shadow: 0.5px 0.5px 8px 1px #999;
+    box-shadow: 0.5px 0.5px 4px 0px #999;
 }
 
 
@@ -184,7 +205,6 @@ export default {
 
 .condition-group-conjunction-btn {
     font-size: var(--cb-conjunction-fontSize);
-    padding-top: var(--cb-conjunction-margin);
     padding: 0;
     height: var(--cb-conjunction-square-size);
     width: var(--cb-conjunction-square-size);

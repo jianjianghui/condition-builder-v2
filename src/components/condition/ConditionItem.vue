@@ -1,6 +1,5 @@
 <template>
   <div class="condition-item">
-    <div>拖拽</div>
     {{ condition }}
     <div>删除</div>
   </div>
@@ -22,5 +21,6 @@ export default {
 .condition-item {
     display: flex;
     padding: 1rem;
+    cursor: all-scroll;
 }
 </style>
