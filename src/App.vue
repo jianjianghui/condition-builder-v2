@@ -1,16 +1,33 @@
 <template>
   <div id="app">
-   <condition-builder style="width: 50vw;margin-top: 20px;margin-left: 20px;"/>
+   <condition-builder  :condition="condition" :dev="true" :config="cbConfig" @initCondition="initCondition"  style="width: 50vw;padding-top: 20px;margin-left: 20px;"/>
   </div>
 </template>
 
 <script>
-import ConditionBuilder from "@/components/ConditionBuilder.vue";
+import ConditionBuilder from "@/components/condition/ConditionBuilder.vue"
 
 export default {
   name: 'App',
   components: {
     ConditionBuilder
+  },
+  data() {
+    return {
+      cbConfig: {
+        editModel:'manual',
+        language:'js',
+        fieldConfig: {
+          dateFormat:'millisecondTimestamp'
+        }
+      },
+      condition : null
+    }
+  },
+  methods: {
+    initCondition(condition) {
+      this.condition = condition
+    }
   }
 }
 </script>
