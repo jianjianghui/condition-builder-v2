@@ -128,7 +128,7 @@ export default {
 
   },
   mounted() {
-    if (this.dev && this.language != 'js') {
+    if (this.dev && this.language !== 'js') {
       alert('编辑以及测试表达式仅支持JS语言')
     }
     window.builder = this
@@ -190,8 +190,7 @@ export default {
     testCondition(item, expression) {
       console.log(item,expression)
       const expressionFn = new Function(Object.keys(item), 'return ' + expression)
-      const available = expressionFn(...Object.values(item))
-      return available
+      return expressionFn(...Object.values(item))
     },
     /**
      * 转换为JS表达式
