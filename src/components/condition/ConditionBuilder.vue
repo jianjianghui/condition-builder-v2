@@ -146,7 +146,6 @@ export default {
           okText: '放弃更改',
           cancelText: '取消',
           onOk: () => {
-            console.log(this)
             this.expression = this.toJsExpression()
             // eslint-disable-next-line vue/no-mutating-props
             this.config.editModel = 'generator'
@@ -160,7 +159,6 @@ export default {
 
       // eslint-disable-next-line vue/no-mutating-props
       this.config.editModel = 'generator'
-      console.log('当前表达式不受表达式生成器支持，将丢弃当前表达式')
     },
     test(text, expression) {
       if (!text) {
@@ -188,7 +186,6 @@ export default {
      * @return {boolean} 是否通过
      */
     testCondition(item, expression) {
-      console.log(item,expression)
       const expressionFn = new Function(Object.keys(item), 'return ' + expression)
       return expressionFn(...Object.values(item))
     },

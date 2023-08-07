@@ -97,12 +97,10 @@ export default {
     setHover(isHover) {
       if(!this.isMouseDown) {
         this.isHover = isHover
-        console.log(this.parent)
         this.parent?.setHover(false)
       }
     },
     setMouseDown(isMouseDown) {
-      console.log(isMouseDown)
       this.isMouseDown = isMouseDown
       this.$refs["sub-group"]?.forEach(item=> item.setMouseDown(isMouseDown))
     },
