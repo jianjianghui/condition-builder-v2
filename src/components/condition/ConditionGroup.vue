@@ -17,12 +17,14 @@
           <transition-group type="transition">
             <div v-for="(element,index) in conditionGroup.children" :key="element.id"
                  v-show="index === 0 || (!collapse && index !== 0)">
-                <condition-group v-if="element.conjunction && element.children"
-                                 :ref="'sub-group'" class="sub-group"
-                                 :parent="me"
-                                 :conditionGroup="element"
-                                 :removable="true" :parent-condition-group="conditionGroup"/>
-              <condition-item  class="condition-group-wrapper-body" v-else :condition="element"/>
+              <condition-group v-if="element.conjunction && element.children"
+                               :ref="'sub-group'" class="sub-group"
+                               :parent="me"
+                               :conditionGroup="element"
+                               :removable="true" :parent-condition-group="conditionGroup"
+                               :schema="schema"/>
+              <condition-item v-else :parent-condition-group="conditionGroup" class="condition-group-wrapper-body"
+                              :condition="element" :schema="schema"/>
             </div>
           </transition-group>
         </draggable>
@@ -38,7 +40,11 @@
         </a-button>
       </div>
       <div v-show="collapse" class="condition-group-collapse">
-        <a-divider class="condition-group-collapse-divider"><a-button class="condition-group-collapse-btn" type="link" @click="fold(false)">展开全部<a-icon type="down" /></a-button></a-divider>
+        <a-divider class="condition-group-collapse-divider">
+          <a-button class="condition-group-collapse-btn" type="link" @click="fold(false)">展开全部
+            <a-icon type="down"/>
+          </a-button>
+        </a-divider>
       </div>
     </div>
   </div>
@@ -72,6 +78,9 @@ export default {
     },
     parentConditionGroup: {
       type: Object
+    },
+    schema: {
+      type: Object
     }
   },
   setup({ conditionGroup }) {
@@ -85,7 +94,7 @@ export default {
         animation: 200
       },
       isHover: false,
-      isMouseDown:false
+      isMouseDown: false
     }
   },
   computed: {
@@ -95,14 +104,14 @@ export default {
   },
   methods: {
     setHover(isHover) {
-      if(!this.isMouseDown) {
+      if (!this.isMouseDown) {
         this.isHover = isHover
         this.parent?.setHover(false)
       }
     },
     setMouseDown(isMouseDown) {
       this.isMouseDown = isMouseDown
-      this.$refs["sub-group"]?.forEach(item=> item.setMouseDown(isMouseDown))
+      this.$refs["sub-group"]?.forEach(item => item.setMouseDown(isMouseDown))
     },
     toggleFold() {
       if (this.children.length <= 1) {
@@ -111,13 +120,13 @@ export default {
 
       this.collapse = !this.collapse
       for (let i = 0; i < this.children.length; i++) {
-        this.$refs["sub-group"]?.forEach(item=> item.fold(this.collapse))
+        this.$refs["sub-group"]?.forEach(item => item.fold(this.collapse))
       }
     },
     fold(isTrue) {
       this.collapse = isTrue
       for (let i = 0; i < this.children.length; i++) {
-        this.$refs["sub-group"].forEach(item=> item.fold(isTrue))
+        this.$refs["sub-group"].forEach(item => item.fold(isTrue))
       }
     },
     toggleConjunction() {
@@ -127,6 +136,9 @@ export default {
     addConditionItem() {
       this.conditionGroupRef.children.push({
         id: generateSnowflakeId(),
+        field: '',
+        operation: '',
+        value: undefined
       })
     },
     addConditionItemGroup() {
@@ -162,13 +174,14 @@ export default {
 
 .condition-group {
     display: flex;
-    margin-top: 20px;
+    margin-top: 32px;
     border-radius: 15px;
 }
 
 .condition-group.sub-group:hover {
     cursor: all-scroll;
 }
+
 .condition-group.sub-group.is-hover {
     transition: all 0.3s ease;
     border-radius: 15px;
@@ -229,10 +242,10 @@ export default {
 }
 
 .condition-group-collapse-divider {
-  margin: 0;
+    margin: 0;
 }
 
 .condition-group-collapse-btn {
-  font-size: 12px;
+    font-size: 12px;
 }
 </style>

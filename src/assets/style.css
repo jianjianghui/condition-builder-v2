@@ -1,0 +1,8 @@
+* {
+    padding: 0;
+    margin: 0;
+}
+
+.condition-item-select .ant-select-selection-selected-value {
+    padding-right: 0.5rem;
+}

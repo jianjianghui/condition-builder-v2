@@ -5,6 +5,7 @@ import App from './App.vue'
 Vue.config.productionTip = false
 
 import 'ant-design-vue/dist/antd.css'
+import '@/assets/style.css'
 
 Vue.use(Antd)
 new Vue({

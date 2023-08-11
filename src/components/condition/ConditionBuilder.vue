@@ -1,6 +1,6 @@
 <template>
   <div>
-    <condition-group ref="conditionGroup" v-if="this.editModel === 'generator'" :conditionGroup="condition"/>
+    <condition-group ref="conditionGroup" v-if="init && this.editModel === 'generator'" :conditionGroup="condition" :schema="schema"/>
     <div v-if="dev" class="condition-preview">
       <div class="condition-preview-header">
         <div class="condition-preview-header-title">{{
@@ -81,6 +81,7 @@ export default {
   },
   data() {
     return {
+      init:false,
       expression: '',
       testValue: '',
       testResult: '',
@@ -93,31 +94,6 @@ export default {
   },
   created() {
     if (!this.condition) {
-      /*
-      conditions: {
-        id: '11234',
-        conjunction: 'or',
-        children: [
-          // {
-          //   id: 'id',
-          //   field: 'name',
-          //   operation: 'empty',
-          // },
-          // {
-          //   id: 'id',
-          //   field: 'age',
-          //   operation: 'empty',
-          // },
-          // {
-          //   id: 'id',
-          //   field: 'age',
-          //   operation: 'equals',
-          //   value: 8
-          // }
-        ]
-      }
-       */
-
       this.$emit('initCondition', {
         id: generateSnowflakeId(),
         conjunction: 'or',
@@ -125,13 +101,13 @@ export default {
 
       })
     }
-
   },
   mounted() {
     if (this.dev && this.language !== 'js') {
       alert('编辑以及测试表达式仅支持JS语言')
     }
     window.builder = this
+    this.init = true
   },
   methods: {
     useManual() {
@@ -146,7 +122,7 @@ export default {
           okText: '放弃更改',
           cancelText: '取消',
           onOk: () => {
-            this.expression = this.toJsExpression()
+            this.expression = this.toJsExpression(this.condition)
             // eslint-disable-next-line vue/no-mutating-props
             this.config.editModel = 'generator'
           },
@@ -193,6 +169,11 @@ export default {
      * 转换为JS表达式
      */
     toJsExpression(condition) {
+      const logicRule = { or: '||', and: '&&' }
+      const compareRule = {}
+      const arrayRule = {contains:'${value}.includes(${field})'}
+      let conjunction = condition.conjunction
+
       return ''
     },
     /**
@@ -205,9 +186,19 @@ export default {
     },
     /**
      * 解析JS表达式
+     * test () || ()
      */
-    parseJsExpression() {
+    parseJsExpression(expression) {
 
+    }
+  },
+  watch: {
+    condition: {
+      deep: true,
+      handler(newValue) {
+        // console.log('condition change')
+        this.expression = this.toJsExpression(newValue)
+      }
     }
   }
 }
